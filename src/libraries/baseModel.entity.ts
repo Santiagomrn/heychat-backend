@@ -1,5 +1,12 @@
 import { User } from '@modules/user/entities/user.entity';
-import { Column, DataType, Model, PrimaryKey } from 'sequelize-typescript';
+import {
+  Column,
+  CreatedAt,
+  DataType,
+  Model,
+  PrimaryKey,
+  UpdatedAt,
+} from 'sequelize-typescript';
 
 /* 
   BaseModel: 
@@ -17,6 +24,10 @@ export abstract class BaseModel<
     allowNull: true,
   })
   id: number;
+  @CreatedAt
+  createdAt: Date;
+  @UpdatedAt
+  updatedAt: Date;
 
   toJSON(): Plain<T> {
     return super.toJSON() as Plain<T>;
