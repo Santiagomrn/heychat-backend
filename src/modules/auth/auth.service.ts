@@ -13,7 +13,7 @@ import * as uuid from 'uuid';
 import _ from 'lodash';
 import { UserRepository } from '@modules/user/user.repository';
 import { Logger } from '@core/logger/Logger';
-import { Plain } from '@libraries/BaseModel';
+import { Plain } from '@libraries/baseModel.entity';
 import { FederatedCredentialRepository } from './federatedCredential.Repository';
 import crypto from 'crypto';
 import { FederatedUserDto } from '@modules/auth/dto/federatedUser.dto';
@@ -26,6 +26,7 @@ import { ResetPasswordDto } from '@modules/auth/dto/resetPassword.dto';
 import { ResetPasswordEmailDto } from './dto/resetPasswordEmail.dto';
 import { TokenDto } from './dto/token.dto';
 import { Role } from '@modules/role/entities/role.entity';
+import { CredentialsDto } from './dto/Credentials.dto';
 
 export interface Token {
   token: string;
@@ -116,16 +117,17 @@ export class AuthService {
       expires_in: expires_in,
     };
   }
-  public async createCredentials(user: Plain<User>) {
-    const accessToken = await this.createToken(user, TOKEN_TYPE.ACCESS);
-    const refreshToken = await this.createToken(user, TOKEN_TYPE.REFRESH);
-    const credentials = {
+  public async createCredentials(user: User): Promise<CredentialsDto> {
+    const plainUser = user.toJSON();
+    const accessToken = await this.createToken(plainUser, TOKEN_TYPE.ACCESS);
+    const refreshToken = await this.createToken(plainUser, TOKEN_TYPE.REFRESH);
+    const credentials = CredentialsDto.fromPlain({
       token: accessToken.token,
       expires: accessToken.expires,
-      refresh_token: refreshToken,
-      user: _.pick(user, ['id', 'name', 'email']),
-      roles: user.roles,
-    };
+      refreshToken: refreshToken.token,
+      user: plainUser,
+      roles: plainUser.roles,
+    });
     return credentials;
   }
   public async confirmEmail(token: string) {
@@ -216,7 +218,7 @@ export class AuthService {
 
     return user;
   }
-  private validateJwt(token: string, type = TOKEN_TYPE.ACCESS) {
+  public validateJwt(token: string, type = TOKEN_TYPE.ACCESS) {
     this.jwtService.verify(token);
     const jwtPayload = this.jwtService.decode<IJwtPayload>(token);
     // If audience doesn't match
@@ -232,6 +234,9 @@ export class AuthService {
       );
     }
     return jwtPayload;
+  }
+  public decodeJwt(token: string) {
+    return this.jwtService.decode<IJwtPayload>(token);
   }
   private async createUser(createUserDto: CreateUserDto) {
     let user: User = null;
