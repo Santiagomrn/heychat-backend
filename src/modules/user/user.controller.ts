@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Query,
   HttpCode,
+  Session,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -35,6 +36,8 @@ import { IsSelfUserOrIsRole } from '@modules/auth/decorators/isSelfUserOrIsRole.
 import { ROLES } from '@modules/role/enums/roles.enum';
 import { IsRole } from '@modules/auth/decorators/isRole.decorator';
 import { UserResponseDto } from './dto/user-response.dto';
+import { UserChatResponseDto } from './dto/user-online-response.dto';
+import { ArrayWhereOptions } from '@libraries/baseModel.entity';
 
 @ApiExtraModels(User)
 @ApiTags('users')
@@ -53,7 +56,7 @@ export class UserController {
   @ValidateJWT()
   @Get()
   async findAll(
-    @Query('where', ParseWherePipe) where?: WhereOptions,
+    @Query('where', ParseWherePipe) where?: ArrayWhereOptions<User>,
     @Query('offset', ParseOffsetPipe) offset?: number,
     @Query('limit', ParseLimitPipe) limit?: number,
     @Query('order', ParseOrderPipe) order?: OrderItem[],
@@ -69,6 +72,29 @@ export class UserController {
       limit,
       include,
       order,
+    });
+  }
+
+  @ApiOperation({ summary: 'Get all User chats' })
+  @ApiQueryAttributes()
+  @ApiQueryWhere()
+  @ApiQueryInclude()
+  @ApiQueryPagination()
+  @ApiOkResponsePaginatedData(UserChatResponseDto)
+  @ApiCommonResponses()
+  @ValidateJWT()
+  @Get('chats')
+  async findAllChatsWith(
+    @Session() session,
+    @Query('where', ParseWherePipe) where?: ArrayWhereOptions<User>,
+    @Query('offset', ParseOffsetPipe) offset?: number,
+    @Query('limit', ParseLimitPipe) limit?: number,
+  ) {
+    const authUserId = session.jwt.id;
+    return await this.userService.findAllUserChats(authUserId, {
+      where,
+      offset,
+      limit,
     });
   }
 

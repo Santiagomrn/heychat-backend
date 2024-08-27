@@ -13,9 +13,10 @@ import bcrypt from 'bcrypt';
 import { Role } from '@modules/role/entities/role.entity';
 import { UserRole } from '@modules/userrole/entities/userrole.entity';
 import { Transaction } from 'sequelize';
-import { BaseModel } from '@libraries/BaseModel';
+import { BaseModel } from '@libraries/baseModel.entity';
 import { ApiHideProperty } from '@nestjs/swagger';
 import { FederatedCredential } from '@modules/auth/entities/federatedCredential.entity';
+import { Message } from '@modules/message/entities/message.entity';
 export enum AuthType {
   Email = 'email',
   Microsoft = 'microsoft',
@@ -39,6 +40,13 @@ export class User extends BaseModel<User> {
     defaultValue: null,
   })
   lastName: string;
+
+  @Column({
+    type: DataType.STRING(1000),
+    allowNull: true,
+    defaultValue: null,
+  })
+  avatar: string;
 
   @Column({
     type: DataType.STRING,
@@ -82,6 +90,13 @@ export class User extends BaseModel<User> {
   })
   authType: AuthType.Email | AuthType.Microsoft | AuthType.Google;
 
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  })
+  isOnline: boolean;
+
   @ApiHideProperty()
   @HasMany(() => UserRole, {
     hooks: true,
@@ -98,6 +113,14 @@ export class User extends BaseModel<User> {
     constraints: true,
   })
   roles: Role[];
+
+  @ApiHideProperty()
+  @HasMany(() => Message, { foreignKey: 'senderId', as: 'sentMessages' })
+  sentMessages: Message[];
+
+  @ApiHideProperty()
+  @HasMany(() => Message, { foreignKey: 'receiverId', as: 'receivedMessages' })
+  receivedMessages: Message[];
 
   @BeforeBulkCreate
   @BeforeBulkUpdate
@@ -170,6 +193,7 @@ export class User extends BaseModel<User> {
     return roles;
   }
   async confirmEmail(t: Transaction = null) {
+    this.isActive = true;
     this.isEmailConfirmed = true;
     await this.save({ transaction: t });
   }

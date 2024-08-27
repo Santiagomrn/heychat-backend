@@ -1,4 +1,3 @@
-import { AuthType } from '../entities/user.entity';
 import {
   IsEmail,
   IsNotEmpty,
@@ -18,8 +17,6 @@ export class CreateUserDto {
   @MinLength(8)
   @IsString()
   password: string;
-
-  authType: AuthType = AuthType.Email;
 
   @IsNotEmpty()
   @MaxLength(255)

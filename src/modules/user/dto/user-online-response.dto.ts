@@ -6,7 +6,7 @@ import { UserRole } from '@modules/userrole/entities/userrole.entity';
 import { ApiHideProperty } from '@nestjs/swagger';
 import { Message } from '@modules/message/entities/message.entity';
 
-export class UserResponseDto implements Plain<User> {
+export class UserChatResponseDto implements Plain<User> {
   @Expose()
   id: number;
   @Expose()
@@ -14,28 +14,35 @@ export class UserResponseDto implements Plain<User> {
   @Expose()
   lastName: string;
   @Expose()
+  isOnline: boolean;
+  @Expose()
   avatar: string;
-  @Expose()
+
+  @Exclude()
+  @ApiHideProperty()
   email: string;
-  @Expose()
+  @Exclude()
+  @ApiHideProperty()
   isActive: boolean;
-  @Expose()
+  @Exclude()
+  @ApiHideProperty()
   isEmailConfirmed: boolean;
   @Exclude()
   @ApiHideProperty()
   password: string;
-  @Expose()
+  @Exclude()
+  @ApiHideProperty()
   authType: AuthType;
-  @Expose()
-  isOnline: boolean;
-  @Expose()
+  @Exclude()
+  @ApiHideProperty()
   createdAt: Date;
-  @Expose()
+  @Exclude()
+  @ApiHideProperty()
   updatedAt: Date;
   @Exclude()
   @ApiHideProperty()
   userRoles: UserRole[];
-  @Expose()
+  @Exclude()
   @ApiHideProperty()
   roles: Role[] = undefined;
   @Expose()
@@ -45,19 +52,21 @@ export class UserResponseDto implements Plain<User> {
   @ApiHideProperty()
   receivedMessages: Message[] = undefined;
 
-  static fromPlain(user: Plain<User>): UserResponseDto;
-  static fromPlain(user: Plain<User>[]): UserResponseDto[];
+  static fromPlain(user: Plain<User>): UserChatResponseDto;
+  static fromPlain(user: Plain<User>[]): UserChatResponseDto[];
   static fromPlain(
     user: Plain<User> | Plain<User>[],
-  ): UserResponseDto | UserResponseDto[] {
-    return plainToClass(UserResponseDto, user, {
+  ): UserChatResponseDto | UserChatResponseDto[] {
+    return plainToClass(UserChatResponseDto, user, {
       excludeExtraneousValues: true,
     });
   }
 
-  static fromUser(user: User): UserResponseDto;
-  static fromUser(user: User[]): UserResponseDto[];
-  static fromUser(_user: User | User[]): UserResponseDto | UserResponseDto[] {
+  static fromUser(user: User): UserChatResponseDto;
+  static fromUser(user: User[]): UserChatResponseDto[];
+  static fromUser(
+    _user: User | User[],
+  ): UserChatResponseDto | UserChatResponseDto[] {
     let user: Plain<User> | Plain<User>[];
     if (Array.isArray(_user)) {
       user = _user.map((user) => {
@@ -67,7 +76,7 @@ export class UserResponseDto implements Plain<User> {
       user = _user.toJSON();
     }
 
-    return plainToClass(UserResponseDto, user, {
+    return plainToClass(UserChatResponseDto, user, {
       excludeExtraneousValues: true,
     });
   }

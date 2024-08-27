@@ -9,7 +9,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { Role } from '@modules/role/entities/role.entity';
 import _ from 'lodash';
-import { Transaction } from 'sequelize';
+import { literal, Transaction, WhereOptions } from 'sequelize';
+import { config } from '@config/index';
 
 @Injectable()
 export class UserRepository extends SequelizeCrudRepository<User> {
@@ -65,7 +66,6 @@ export class UserRepository extends SequelizeCrudRepository<User> {
     );
     return user;
   }
-
   async notExistsByEmail(email: string, transaction?: Transaction) {
     try {
       await this.findOneByEmail(email, transaction);
@@ -73,5 +73,47 @@ export class UserRepository extends SequelizeCrudRepository<User> {
     } catch (error) {
       if (!(error instanceof NotFoundException)) throw error;
     }
+  }
+  async findAndCountAllUserChats(
+    userId: number,
+    options: {
+      where?: WhereOptions<User>;
+      limit?: number;
+      offset?: number;
+    } = {
+      where: [],
+      limit: config.api.limit,
+      offset: config.api.offset,
+    },
+    t: Transaction = null,
+  ) {
+    const {
+      limit = config.api.limit,
+      offset = config.api.offset,
+      where = [],
+    } = options;
+    const result = await this.model.findAndCountAll({
+      attributes: {
+        include: [
+          [
+            literal(`(SELECT createdAt from message WHERE (senderId = ${Number(userId)} AND receiverId = User.id) OR (receiverId =${Number(userId)} AND senderId = User.id) ORDER BY CASE
+        WHEN createdAt > createdAt THEN createdAt
+        ELSE createdAt
+      END DESC LIMIT 0, 1)`),
+            'lastMessageTimeStamp',
+          ],
+        ],
+      },
+      where,
+      order: [['lastMessageTimeStamp', 'DESC']],
+      offset,
+      limit,
+    });
+    return {
+      count: 1,
+      limit: limit,
+      offset: offset,
+      data: result.rows as User[],
+    };
   }
 }
