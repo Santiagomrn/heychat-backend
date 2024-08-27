@@ -92,7 +92,7 @@ export const config = {
   },
   log: {
     // Console Log levels: error, warn, info, verbose, debug, silly
-    level: process.env.LOG_LEVEL || 'http',
+    level: process.env.LOG_LEVEL || 'debug',
     logToFiles: process.env.LOG_TO_FILES
       ? process.env.LOG_TO_FILES === 'true'
       : false,
@@ -108,12 +108,19 @@ export const config = {
     username: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres',
     host: process.env.DB_HOST || 'localhost',
-    dialect: (process.env.DB_TYPE || 'postgres') as Dialect,
+    dialect: (process.env.DB_TYPE || 'sqlite') as Dialect,
     storage: null,
     logging: false,
     timezone: 'utc', // IMPORTANT For correct timezone management with DB.
   },
-
+  oauth: {
+    successful: {
+      redirect: process.env.OAUTH_SUCCESSFUL_REDIRECT,
+    },
+    fail: {
+      redirect: process.env.OAUTH_FAIL_REDIRECT,
+    },
+  },
   auth: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID || 'use your own credentials',
