@@ -8,6 +8,7 @@ import { NoteModule } from '@modules/note/note.module';
 import { EmailModule } from '@modules/email/email.module';
 
 import { WebsocketModule } from '@modules/websocket/websocket.module';
+import { MessageModule } from '@modules/message/message.module';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { WebsocketModule } from '@modules/websocket/websocket.module';
     UserModule,
     AuthModule,
     NoteModule,
-
+    MessageModule,
     WebsocketModule,
   ],
   controllers: [AppController],
