@@ -3,9 +3,12 @@ import {
   Controller,
   Get,
   HttpCode,
+  HttpRedirectResponse,
   HttpStatus,
   Param,
   Post,
+  Redirect,
+  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import { SignInDto } from './dto/signIn.dto';
@@ -18,6 +21,8 @@ import { User } from '@decorators/user.decorator';
 import { ResetPasswordDto } from '@modules/auth/dto/resetPassword.dto';
 import { ResetPasswordEmailDto } from './dto/resetPasswordEmail.dto';
 import { TokenDto } from './dto/token.dto';
+import { config } from '@config/index';
+import { HttpUnauthorizedExceptionFilter } from './Exceptions/httpUnauthorizedException.filter';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -67,9 +72,20 @@ export class AuthController {
   @Get('google')
   authGoogle() {}
 
+  @UseFilters(new HttpUnauthorizedExceptionFilter())
   @Get('google-redirect')
+  @Redirect()
   @UseGuards(GoogleOAuthGuard)
-  async googleAuthRedirect(@User() federatedUser: FederatedUserDto) {
-    return await this.authService.googleAuthRedirect(federatedUser);
+  async googleAuthRedirect(
+    @User() federatedUser: FederatedUserDto,
+  ): Promise<HttpRedirectResponse> {
+    const credentials =
+      await this.authService.googleAuthRedirect(federatedUser);
+    return {
+      url:
+        config.oauth.successful.redirect +
+        `?token=${credentials.token}&refreshToken=${credentials.refreshToken}`,
+      statusCode: HttpStatus.FOUND,
+    };
   }
 }

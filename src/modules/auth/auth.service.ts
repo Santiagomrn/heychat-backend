@@ -60,15 +60,20 @@ export class AuthService {
     private emailService: MailingService,
   ) {}
   public async signIn(singInDto: SignInDto) {
-    const user =
-      await this.userRepository.findOneByEmailAndIsActiveTrueIncludeRole(
-        singInDto.email,
-      );
-    const isAuthenticated = await user.authenticate(singInDto.password);
+    try {
+      const user =
+        await this.userRepository.findOneByEmailAndIsActiveTrueIncludeRole(
+          singInDto.email,
+        );
+      const isAuthenticated = await user.authenticate(singInDto.password);
 
-    if (isAuthenticated === true) {
-      return this.createCredentials(user);
-    } else {
+      if (isAuthenticated === true) {
+        return this.createCredentials(user);
+      } else {
+        throw new UnauthorizedException();
+      }
+    } catch (error) {
+      this.logger.error(error);
       throw new UnauthorizedException();
     }
   }
@@ -199,7 +204,9 @@ export class AuthService {
           firstName: federatedUser.firstName,
           lastName: federatedUser.firstName,
           email: federatedUser.email as string,
+          avatar: federatedUser.picture,
           isEmailConfirmed: true,
+          isActive: true,
           password: crypto.randomBytes(48).toString('hex') as string,
           authType: federatedUser.authType,
         },
