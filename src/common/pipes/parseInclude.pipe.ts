@@ -64,11 +64,12 @@ export class ParseIncludePipe<T extends Model> {
         }
       }
 
-      const { where, required } = querys ?? {};
+      const { where, required, as } = querys ?? {};
 
       return {
         model: this.getModelFromList(m),
         where: ParseWherePipe.sanitizeWhere(where),
+        as,
         required: !!required,
       } as IncludeOptions;
     };

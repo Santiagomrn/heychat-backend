@@ -6,6 +6,7 @@ import {
   Logger,
   PipeTransform,
 } from '@nestjs/common';
+import queryString from 'node:querystring';
 import _ from 'lodash';
 import { Op } from 'sequelize';
 
@@ -37,7 +38,12 @@ const OPERATOR_ALIASES = {
 export class ParseWherePipe implements PipeTransform {
   private logger: Logger = new Logger(ParseWherePipe.name);
   transform(value: string, metadata: ArgumentMetadata) {
-    const whereValue = value ?? '[]';
+    const undecodedWhereValue = value ?? '[]';
+    let { whereValue } = queryString.decode(
+      'whereValue=' + undecodedWhereValue,
+    );
+    if (_.isString(whereValue))
+      whereValue = whereValue.replace(/:"%\$/g, ':"%');
     if (Array.isArray(whereValue)) return whereValue;
     try {
       return ParseWherePipe.parseWhereString(whereValue);
