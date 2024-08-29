@@ -4,7 +4,6 @@ import { AppService } from './app.service';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { DatabaseModule } from './core/database/database';
-import { NoteModule } from '@modules/note/note.module';
 import { EmailModule } from '@modules/email/email.module';
 
 import { WebsocketModule } from '@modules/websocket/websocket.module';
@@ -16,7 +15,6 @@ import { MessageModule } from '@modules/message/message.module';
     EmailModule,
     UserModule,
     AuthModule,
-    NoteModule,
     MessageModule,
     WebsocketModule,
   ],
