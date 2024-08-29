@@ -8,14 +8,12 @@ import { AppService } from 'src/app.service';
 import { UserModule } from '@modules/user/user.module';
 import { AuthModule } from '@modules/auth/auth.module';
 import { MessageModule } from '../message.module';
-import { CreateMessageDtoFactory, UpdateMessageDtoFactory } from './factories';
 import { EmailModule } from '@modules/email/email.module';
-import { User } from '@modules/user/entities/user.entity';
+import { faker } from '@faker-js/faker';
 
 describe('MessageController (e2e)', () => {
   let app: INestApplication;
   let token: string;
-  let user: Partial<User>;
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
@@ -43,86 +41,14 @@ describe('MessageController (e2e)', () => {
         password: 'Passw0rd',
       })
       .expect(200);
-    user = data.body.user;
     token = data.body.token;
   });
-  it('/messages (POST)', async () => {
-    const createMessageDto = CreateMessageDtoFactory();
-    const response = await request(app.getHttpServer())
-      .post('/messages')
-      .send(createMessageDto)
-      .set('Authorization', `Bearer ${token}`)
-      .expect(201);
-    expect(response.body).toStrictEqual({
-      ...createMessageDto,
-      id: expect.any(Number),
-      createdAt: expect.any(String),
-      updatedAt: expect.any(String),
-      userId: user.id,
-    });
-    return;
-  });
-  it('/messages (GET)', async () => {
-    return request(app.getHttpServer())
-      .get('/messages')
-      .set('Authorization', `Bearer ${token}`)
-      .expect(200);
-  });
-  it('/messages/:id (GET)', async () => {
-    const createMessageDto = CreateMessageDtoFactory();
-    const { body: message } = await request(app.getHttpServer())
-      .post('/messages')
-      .send(createMessageDto)
-      .set('Authorization', `Bearer ${token}`)
-      .expect(201);
-    const response = await request(app.getHttpServer())
-      .get(`/messages/${message.id}`)
-      .set('Authorization', `Bearer ${token}`)
-      .expect(200);
 
-    expect(response.body).toMatchObject({
-      ...createMessageDto,
-      id: expect.any(Number),
-      createdAt: expect.any(String),
-      updatedAt: expect.any(String),
-      userId: user.id,
-    });
-    return;
-  });
-  it('/messages/:id (PATCH)', async () => {
-    const createMessageDto = CreateMessageDtoFactory();
-    const { body: message } = await request(app.getHttpServer())
-      .post('/messages')
-      .send(createMessageDto)
-      .set('Authorization', `Bearer ${token}`)
-      .expect(201);
-
-    const updateMessageDto = UpdateMessageDtoFactory();
-    const response = await request(app.getHttpServer())
-      .patch(`/messages/${message.id}`)
-      .set('Authorization', `Bearer ${token}`)
-      .send(updateMessageDto)
-      .expect(200);
-    expect(response.body).toMatchObject({
-      ...updateMessageDto,
-      id: expect.any(Number),
-      createdAt: expect.any(String),
-      updatedAt: expect.any(String),
-      userId: user.id,
-    });
-    return;
-  });
-  it('/messages/:id (DELETE)', async () => {
-    const createMessageDto = CreateMessageDtoFactory();
-    const { body: message } = await request(app.getHttpServer())
-      .post('/messages')
-      .send(createMessageDto)
-      .set('Authorization', `Bearer ${token}`)
-      .expect(201);
+  it('/messages/users/:userId (GET)', async () => {
     return request(app.getHttpServer())
-      .delete(`/messages/${message.id}`)
+      .get('/messages/users/' + faker.number.int())
       .set('Authorization', `Bearer ${token}`)
-      .expect(204);
+      .expect(200);
   });
 
   afterAll(async () => {

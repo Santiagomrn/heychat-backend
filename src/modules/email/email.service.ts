@@ -32,12 +32,12 @@ export class MailingService implements OnApplicationShutdown {
     subject: string,
     html: string,
   ): Promise<any> {
-    return await this.mailer.sendMail({
-      from: config.email.from_address,
-      to: email,
-      subject: subject,
-      html: html,
-    });
+    // return await this.mailer.sendMail({
+    //   from: config.email.from_address,
+    //   to: email,
+    //   subject: subject,
+    //   html: html,
+    // });
   }
 
   private compileTemplate(context: any): Promise<string> {

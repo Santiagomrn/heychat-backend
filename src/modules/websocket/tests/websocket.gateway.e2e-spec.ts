@@ -120,6 +120,7 @@ describe('WebsocketGateway', () => {
         }
       });
     });
+
     ioSender.disconnect();
     ioReceiver.disconnect();
     await wait(2000);

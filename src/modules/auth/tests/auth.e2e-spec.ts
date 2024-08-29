@@ -139,7 +139,7 @@ describe('AuthController (e2e)', () => {
     );
 
     const { body: refreshCredentials } = await refreshToken(
-      credentials.refresh_token.token,
+      credentials.refreshToken,
     );
     expect(refreshCredentials).toMatchObject({
       token: expect.any(String),
