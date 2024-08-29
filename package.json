@@ -1,8 +1,8 @@
 {
-  "name": "chatapp",
+  "name": "heychat-nestjs",
   "version": "0.0.1",
   "description": "",
-  "author": "miker",
+  "author": "rodrigueznohsantiagomiguel@gmail.com",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -55,7 +55,6 @@
     "helmet": "^7.1.0",
     "morgan": "^1.10.0",
     "nest-winston": "^1.9.4",
-    
     "nodemailer": "^6.9.11",
     "object-hash": "^3.0.0",
     "passport-google-oauth20": "^2.0.0",
