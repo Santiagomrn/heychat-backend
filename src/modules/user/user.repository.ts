@@ -104,7 +104,7 @@ export class UserRepository extends SequelizeCrudRepository<User> {
         ],
       },
       where,
-      order: [['lastMessageTimeStamp', 'DESC']],
+      order: [['lastMessageTimeStamp', 'DESC NULLS LAST']],
       offset,
       limit,
       logging: true,
