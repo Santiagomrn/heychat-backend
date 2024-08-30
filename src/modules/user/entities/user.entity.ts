@@ -84,7 +84,7 @@ export class User extends BaseModel<User> {
   password: string;
 
   @Column({
-    type: DataType.ENUM(AuthType.Email),
+    type: DataType.STRING,
     allowNull: false,
     defaultValue: AuthType.Email,
   })

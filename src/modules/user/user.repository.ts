@@ -96,10 +96,9 @@ export class UserRepository extends SequelizeCrudRepository<User> {
       attributes: {
         include: [
           [
-            literal(`(SELECT createdAt from message WHERE (senderId = ${Number(userId)} AND receiverId = User.id) OR (receiverId =${Number(userId)} AND senderId = User.id) ORDER BY CASE
-        WHEN createdAt > createdAt THEN createdAt
-        ELSE createdAt
-      END DESC LIMIT 0, 1)`),
+            literal(
+              `(SELECT "createdAt" from "message" WHERE ("senderId" = ${Number(userId)} AND "receiverId" = "User"."id") OR ("receiverId" =${Number(userId)} AND "senderId" = "User"."id") ORDER BY "createdAt" DESC LIMIT 1 OFFSET 0)`,
+            ),
             'lastMessageTimeStamp',
           ],
         ],
@@ -108,6 +107,7 @@ export class UserRepository extends SequelizeCrudRepository<User> {
       order: [['lastMessageTimeStamp', 'DESC']],
       offset,
       limit,
+      logging: true,
     });
     return {
       count: 1,
@@ -117,3 +117,11 @@ export class UserRepository extends SequelizeCrudRepository<User> {
     };
   }
 }
+
+('sqlite');
+// literal(`(SELECT createdAt from message WHERE (senderId = ${Number(userId)} AND receiverId = User.id) OR (receiverId =${Number(userId)} AND senderId = User.id) ORDER BY CASE
+// WHEN createdAt > createdAt THEN createdAt
+// ELSE createdAt
+// END DESC LIMIT 0, 1)`),
+//     'lastMessageTimeStamp',
+//   ],
